@@ -4,6 +4,8 @@
 # Node.js dependencies folder
 node_modules/
 
+#Folders
+uploads/
 
 
 # config
