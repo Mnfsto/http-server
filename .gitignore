@@ -1,0 +1,20 @@
+# File with secrets (tokens, passwords, API keys, database connection string)
+.env
+
+# Node.js dependencies folder
+node_modules/
+
+
+
+# config
+config/google-credentials.json*
+# Logs
+*.log
+npm-debug.log*
+
+
+
+# Files IDE
+.idea/
+
+
