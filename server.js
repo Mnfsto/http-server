@@ -37,14 +37,22 @@ const prepareFile = async (url) => {
 };
 
 const server = http.createServer(async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   const file = await prepareFile(req.url);
   const statusCode = file.found ? 200 : 404;
   const mimeType = MIME_TYPES[file.ext] || MIME_TYPES.default;
   res.writeHead(statusCode, { 'Content-Type': mimeType });
   file.stream.pipe(res);
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
   console.log(`${req.method} ${req.url} ${statusCode}`);
 
-  if (req.url === '/userdata.html' && req.method === 'POST') {
+  if (req.url === '/api/form' && req.method === 'POST') {
 
     const chunks = [];
     for await (const chunk of req) {
@@ -71,6 +79,7 @@ const server = http.createServer(async (req, res) => {
         console.log(`Saved: ${file.filename}`);
       }
     });
+    res.end();
     try {
       console.log('Create Data');
       // eslint-disable-next-line no-unused-vars
