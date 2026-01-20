@@ -1,6 +1,6 @@
 # File with secrets (tokens, passwords, API keys, database connection string)
 .env
-
+google-credentials.json
 # Node.js dependencies folder
 node_modules/
 

@@ -3,7 +3,8 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const PORT = process.env.PORT || 8000;
-
+require('dotenv').config();
+const { appendToSheet,appendToDisc } = require('./api/googleApiService');
 
 const MIME_TYPES = {
   default: 'application/octet-stream',
@@ -67,8 +68,9 @@ const server = http.createServer(async (req, res) => {
     }
     const boundary = contentType.split('boundary=')[1];
     const data = parseMultipart(buffer, boundary);
+    //const {applicantName, applicantPhone, email} = data;
 
-
+    await appendToSheet(data.fields);
     // eslint-disable-next-line max-len
     console.log('Form Data:', data.fields); // { username: '...', userphone: '...' }
     console.log('Files:', data.files.map((f) => f.filename));
@@ -76,9 +78,11 @@ const server = http.createServer(async (req, res) => {
     data.files.forEach((file) => {
       if (file.filename) {
         fs.writeFileSync(path.join(UPLOAD_DIR, file.filename), file.data);
+        appendToDisc(file);
         console.log(`Saved: ${file.filename}`);
       }
     });
+
     res.end();
     try {
       console.log('Create Data');
