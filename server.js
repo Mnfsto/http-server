@@ -3,8 +3,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const PORT = process.env.PORT || 8000;
-require('dotenv').config();
-const { appendToSheet,appendToDisc } = require('./api/googleApiService');
+
 
 const MIME_TYPES = {
   default: 'application/octet-stream',
@@ -38,22 +37,14 @@ const prepareFile = async (url) => {
 };
 
 const server = http.createServer(async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   const file = await prepareFile(req.url);
   const statusCode = file.found ? 200 : 404;
   const mimeType = MIME_TYPES[file.ext] || MIME_TYPES.default;
   res.writeHead(statusCode, { 'Content-Type': mimeType });
   file.stream.pipe(res);
-  if (req.method === 'OPTIONS') {
-    res.writeHead(204);
-    res.end();
-    return;
-  }
   console.log(`${req.method} ${req.url} ${statusCode}`);
 
-  if (req.url === '/api/form' && req.method === 'POST') {
+  if (req.url === '/userdata.html' && req.method === 'POST') {
 
     const chunks = [];
     for await (const chunk of req) {
@@ -68,9 +59,8 @@ const server = http.createServer(async (req, res) => {
     }
     const boundary = contentType.split('boundary=')[1];
     const data = parseMultipart(buffer, boundary);
-    //const {applicantName, applicantPhone, email} = data;
 
-    await appendToSheet(data.fields);
+
     // eslint-disable-next-line max-len
     console.log('Form Data:', data.fields); // { username: '...', userphone: '...' }
     console.log('Files:', data.files.map((f) => f.filename));
@@ -78,12 +68,9 @@ const server = http.createServer(async (req, res) => {
     data.files.forEach((file) => {
       if (file.filename) {
         fs.writeFileSync(path.join(UPLOAD_DIR, file.filename), file.data);
-        appendToDisc(file);
         console.log(`Saved: ${file.filename}`);
       }
     });
-
-    res.end();
     try {
       console.log('Create Data');
       // eslint-disable-next-line no-unused-vars
