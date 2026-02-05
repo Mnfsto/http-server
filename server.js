@@ -1,12 +1,8 @@
 'use strict';
-const http = require('http');
-
+const http = require('http');;
 const PORT = process.env.PORT || 8000;
 require('dotenv').config();
 const { home, form } = require('./routes');
-
-
-
 
 
 const routes = {

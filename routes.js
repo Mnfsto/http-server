@@ -4,6 +4,7 @@ const path = require('path');
 const { appendToSheet, appendToDisc } = require('./api/googleApiService');
 const sendMail = require('./mailer/nodemailer');
 const smtp = require('./mailer/config');
+const { bot } = require('./bot');
 const MIME_TYPES = {
   default: 'application/octet-stream',
   html: 'text/html; charset=UTF-8',
@@ -118,7 +119,6 @@ async function form(req, res) {
 `,
     };
     await sendMail(message);
-
     // eslint-disable-next-line max-len
     console.log('Form Data:', data.fields); // { username: '...', userphone: '...' }
     console.log('Files:', data.files.map((f) => f.filename));
@@ -131,7 +131,14 @@ async function form(req, res) {
       }
     });
 
-
+    if (process.env.BOT_CHAT) {
+      await bot.sendMessage(process.env.BOT_CHAT, `
+      New Website Inquiry:
+      ${data.fields.name}
+      tel: ${data.fields.telephone}
+      email: ${data.fields.email}
+       `);
+    };
     // Promise.allSettled([])
     //   .then((values) => { console.log(values); })
     //   .catch((err) => console.log(err));
