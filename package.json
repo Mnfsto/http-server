@@ -25,6 +25,8 @@
   },
   "dependencies": {
     "dotenv": "^17.2.3",
-    "googleapis": "^170.1.0"
+    "googleapis": "^170.1.0",
+    "node-telegram-bot-api": "^0.67.0",
+    "nodemailer": "^7.0.13"
   }
 }
